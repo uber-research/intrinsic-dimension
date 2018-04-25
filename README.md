@@ -124,5 +124,5 @@ _Shortcut: to skip all the work and just see the results, take a look at [this n
 
 ## Questions?
 
-Please drop us ([Chunyuan](http://chunyuan.li/), [Rosanne](http://users.eecs.northwestern.edu/~rll943/) or [Jason](http://yosinski.com/)) a line if you have any questions.
+Please drop us ([Chunyuan](http://chunyuan.li/), [Rosanne](rosanne@uber.com) or [Jason](http://yosinski.com/)) a line if you have any questions.
 
