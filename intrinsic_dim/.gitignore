@@ -1,0 +1,11 @@
+*.h5
+*.json
+*.pkl.gz
+*.sublime-project
+fnn_cartpole0/
+results/
+rl_results/
+results_diary/
+rnn_results_2000/
+plots/figs/
+plots/*.pdf
