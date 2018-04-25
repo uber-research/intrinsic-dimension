@@ -15,13 +15,13 @@ This repository contains source code necessary to reproduce the results presente
 ## Contents
 There are four steps to use this codebase to reproduce the results in the paper.
 
-1. [Dependencies](#Dependencies)
-2. [Prepare datasets](#Prepare-datasets)
-3. [Subspace training](#Subspace-training)
-    1. [Subspace training on image classification tasks](#Subspace-training-on-image-classification-tasks)
-    2. [Subspace training on reinforcement learning tasks](#Subspace-training-on-reinforcement-learning-tasks)
-    3. [Subspace training of ImageNet classification in distributed GPUs](#Subspace-training-of-ImageNet-classification-in-distributed-GPUs)
-4. [Collect and plot results](#Collect-and-plot-results)
+1. [Dependencies](#dependencies)
+2. [Prepare datasets](#prepare-datasets)
+3. [Subspace training](#subspace-training)
+    1. Subspace training on image classification tasks
+    2. Subspace training on reinforcement learning tasks
+    3. Subspace training of ImageNet classification in distributed GPUs
+4. [Collect and plot results](#collect-and-plot-results)
 
 
 ## Dependencies
