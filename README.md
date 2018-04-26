@@ -22,7 +22,7 @@ There are four steps to use this codebase to reproduce the results in the paper.
 3. [Subspace training](#subspace-training)
     1. Subspace training on image classification tasks
     2. Subspace training on reinforcement learning tasks
-    3. Subspace training of ImageNet classification in distributed GPUs
+    3. Subspace training of ImageNet classification on distributed GPUs
 4. [Collect and plot results](#collect-and-plot-results)
 
 
@@ -102,7 +102,7 @@ python ./train_dqn.py --vsize 20 --opt adam --lr 0.0001 --l2 0.0001
 ```
 
 
-**3. Subspace training of ImageNet classification in distributed GPUs**
+**3. Subspace training of ImageNet classification on distributed GPUs**
 
 An easy adoption of the software package [horovod](https://github.com/uber/horovod) allows for distributed training on many GPUs, which is helpful for large scale tasks like ImageNet. See [`train_distributed.py`](./intrinsic_dim/train_distributed.py) for details and for an impression how little the incurred changes are from `train.py`.
 
