@@ -39,7 +39,7 @@ This code is based on Python 2.7, with the main dependencies being [TensorFlow==
 
 We consider the following datasets: MNIST (_Standard_, _Shuffled-Pixel_ and _Shuffled-Label_ versions), CIFAR-10, and ImageNet. For convenience, we provide pre-processed and pre-shuffled versions of all datasets (except ImageNet) in one download file. Data are prepared in `hdf5` format, with `train.h5` and `test.h5` representing separate sets of training and test. Each `.h5` file has the same fields: `images` and `labels`.
 
-Datasets can be downloaded [here](https://drive.google.com/open?id=1Cjky0VL6hFGppPhw3w4S-U4Ns0DAKa5T) (zip version is 347 MB, and the full size is 1.5G). To unzip:
+Datasets can be downloaded [here](https://drive.google.com/open?id=1tTrPWo2KBejmgaqajL19LxFoBoJsVTlI) (zip version is 347 MB, and the full size is 1.5G). To unzip:
 
     tar xvzf dataset.tar.gz
 
@@ -134,5 +134,5 @@ _Shortcut: to skip all the work and just see the results, take a look at [this n
 
 ## Questions?
 
-Please drop us ([Chunyuan](http://chunyuan.li/), [Rosanne](rosanne@uber.com) or [Jason](http://yosinski.com/)) a line if you have any questions.
+Please drop us ([Chunyuan](http://chunyuan.li/), [Rosanne](http://users.eecs.northwestern.edu/~rll943/) or [Jason](http://yosinski.com/)) a line if you have any questions.
 
