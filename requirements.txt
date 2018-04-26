@@ -1,6 +1,6 @@
 numpy
 h5py
-IPython
+IPython==5.6
 colorama
 scikit-learn
 tensorflow-gpu
