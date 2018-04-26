@@ -1,7 +1,7 @@
 ## Measuring the Intrinsic Dimension of Objective Landscapes
 
 
-This repository contains source code necessary to reproduce the results presented in the ICLR 2018 paper [Measuring the Intrinsic Dimension of Objective Landscapes](https://arxiv.org/abs/1804.08838):
+This repository contains source code necessary to reproduce the results presented in the paper [Measuring the Intrinsic Dimension of Objective Landscapes](https://arxiv.org/abs/1804.08838) (ICLR 2018):
 
 ```
 @inproceedings{li_id_2018_ICLR
@@ -11,6 +11,8 @@ This repository contains source code necessary to reproduce the results presente
   year={2018}
 }
 ```
+
+For more on this project, see the [Uber AI Labs Blog post](https://eng.uber.com/intrinsic-dimension).
 
 
 

@@ -5,3 +5,4 @@ colorama
 scikit-learn
 tensorflow-gpu
 keras
+orderedset
