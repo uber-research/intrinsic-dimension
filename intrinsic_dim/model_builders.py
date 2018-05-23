@@ -1414,3 +1414,164 @@ def build_squeezenet_direct(weight_decay=0, shift_in=None):
     make_and_add_losses(model, input_labels)
 
     return model
+
+
+def build_squeezenet_fastfood(weight_decay=0, vsize=100, shift_in=None, DD=None):
+    '''If DD is not specified, it will be computed.'''
+
+    im_shape = (224, 224, 3)
+    n_label_vals = 1000
+    im_dtype = 'uint8'
+
+    with tf.name_scope('inputs'):
+        input_images, preproc_images = make_image_input_preproc(im_shape, im_dtype, shift_in=shift_in)
+        input_labels = Input(batch_shape=(None,), dtype='int64')
+
+    def define_model(input_images, preproc_images, Conv2DLayer):
+        xx = Conv2DLayer(96, (7, 7), strides=(2, 2), padding='same',  
+                kernel_initializer='glorot_uniform', activation='relu',
+                kernel_regularizer=l2(weight_decay))(preproc_images)
+        xx = MaxPooling2D((3, 3), strides=(2, 2))(xx)
+
+        xx_sqz = Conv2DLayer(16, (1, 1), padding='same',  
+                kernel_initializer='glorot_uniform', activation='relu',
+                kernel_regularizer=l2(weight_decay))(xx)
+        xx_exp1 = Conv2DLayer(64, (1, 1), padding='same',  
+                kernel_initializer='glorot_uniform', activation='relu',
+                kernel_regularizer=l2(weight_decay))(xx_sqz)
+        xx_exp2 = Conv2DLayer(64, (3, 3), padding='same',  
+                kernel_initializer='glorot_uniform', activation='relu',
+                kernel_regularizer=l2(weight_decay))(xx_sqz)
+        xx_merg = Concatenate()([xx_exp1,xx_exp2])
+
+        xx_sqz = Conv2DLayer(16, (1, 1), padding='same',  
+                kernel_initializer='glorot_uniform', activation='relu',
+                kernel_regularizer=l2(weight_decay))(xx_merg)
+        xx_exp1 = Conv2DLayer(64, (1, 1), padding='same',  
+                kernel_initializer='glorot_uniform', activation='relu',
+                kernel_regularizer=l2(weight_decay))(xx_sqz)
+        xx_exp2 = Conv2DLayer(64, (3, 3), padding='same',  
+                kernel_initializer='glorot_uniform', activation='relu',
+                kernel_regularizer=l2(weight_decay))(xx_sqz)
+        xx_merg = Concatenate()([xx_exp1,xx_exp2])
+
+        xx_sqz = Conv2DLayer(32, (1, 1), padding='same',  
+                kernel_initializer='glorot_uniform', activation='relu',
+                kernel_regularizer=l2(weight_decay))(xx_merg)
+        xx_exp1 = Conv2DLayer(128, (1, 1), padding='same',  
+                kernel_initializer='glorot_uniform', activation='relu',
+                kernel_regularizer=l2(weight_decay))(xx_sqz)
+        xx_exp2 = Conv2DLayer(128, (3, 3), padding='same',  
+                kernel_initializer='glorot_uniform', activation='relu',
+                kernel_regularizer=l2(weight_decay))(xx_sqz)
+        xx_merg = Concatenate()([xx_exp1,xx_exp2])
+        xx = MaxPooling2D((3, 3), strides=(2, 2))(xx_merg)
+
+        xx_sqz = Conv2DLayer(32, (1, 1), padding='same',  
+                kernel_initializer='glorot_uniform', activation='relu',
+                kernel_regularizer=l2(weight_decay))(xx)
+        xx_exp1 = Conv2DLayer(128, (1, 1), padding='same',  
+                kernel_initializer='glorot_uniform', activation='relu',
+                kernel_regularizer=l2(weight_decay))(xx_sqz)
+        xx_exp2 = Conv2DLayer(128, (3, 3), padding='same',  
+                kernel_initializer='glorot_uniform', activation='relu',
+                kernel_regularizer=l2(weight_decay))(xx_sqz)
+        xx_merg = Concatenate()([xx_exp1,xx_exp2])
+
+        xx_sqz = Conv2DLayer(48, (1, 1), padding='same',  
+                kernel_initializer='glorot_uniform', activation='relu',
+                kernel_regularizer=l2(weight_decay))(xx_merg)
+        xx_exp1 = Conv2DLayer(192, (1, 1), padding='same',  
+                kernel_initializer='glorot_uniform', activation='relu',
+                kernel_regularizer=l2(weight_decay))(xx_sqz)
+        xx_exp2 = Conv2DLayer(192, (3, 3), padding='same',  
+                kernel_initializer='glorot_uniform', activation='relu',
+                kernel_regularizer=l2(weight_decay))(xx_sqz)
+        xx_merg = Concatenate()([xx_exp1,xx_exp2])
+
+        xx_sqz = Conv2DLayer(48, (1, 1), padding='same',  
+                kernel_initializer='glorot_uniform', activation='relu',
+                kernel_regularizer=l2(weight_decay))(xx_merg)
+        xx_exp1 = Conv2DLayer(192, (1, 1), padding='same',  
+                kernel_initializer='glorot_uniform', activation='relu',
+                kernel_regularizer=l2(weight_decay))(xx_sqz)
+        xx_exp2 = Conv2DLayer(192, (3, 3), padding='same',  
+                kernel_initializer='glorot_uniform', activation='relu',
+                kernel_regularizer=l2(weight_decay))(xx_sqz)
+        xx_merg = Concatenate()([xx_exp1,xx_exp2])
+
+        xx_sqz = Conv2DLayer(64, (1, 1), padding='same',  
+                kernel_initializer='glorot_uniform', activation='relu',
+                kernel_regularizer=l2(weight_decay))(xx_merg)
+        xx_exp1 = Conv2DLayer(256, (1, 1), padding='same',  
+                kernel_initializer='glorot_uniform', activation='relu',
+                kernel_regularizer=l2(weight_decay))(xx_sqz)
+        xx_exp2 = Conv2DLayer(256, (3, 3), padding='same',  
+                kernel_initializer='glorot_uniform', activation='relu',
+                kernel_regularizer=l2(weight_decay))(xx_sqz)
+        xx_merg = Concatenate()([xx_exp1,xx_exp2])
+        xx = MaxPooling2D((3, 3), strides=(2, 2))(xx_merg)
+
+        xx_sqz = Conv2DLayer(64, (1, 1), padding='same',  
+                kernel_initializer='glorot_uniform', activation='relu',
+                kernel_regularizer=l2(weight_decay))(xx)
+        xx_exp1 = Conv2DLayer(256, (1, 1), padding='same',  
+                kernel_initializer='glorot_uniform', activation='relu',
+                kernel_regularizer=l2(weight_decay))(xx_sqz)
+        xx_exp2 = Conv2DLayer(256, (3, 3), padding='same',  
+                kernel_initializer='glorot_uniform', activation='relu',
+                kernel_regularizer=l2(weight_decay))(xx_sqz)
+        xx_merg = Concatenate()([xx_exp1,xx_exp2])
+
+        xx = Dropout(0.5)(xx_merg)
+
+        xx = Conv2DLayer(n_label_vals, (1, 1), padding='valid',
+                kernel_initializer='glorot_uniform',
+                kernel_regularizer=l2(weight_decay))(xx)
+        xx = AveragePooling2D((13, 13))(xx)
+        logits = Flatten()(xx)
+
+        model = ExtendedModel(input=input_images, output=logits)
+
+        for field in ['logits']:
+            model.add_var(field, locals()[field])
+            
+        return model
+
+
+    # Allow manual specification of D if desired
+    if not DD:
+        # Silly-but-not-too-bad hack to determine direct parameter
+        # dimension D: make the whole model using direct layers, then
+        # instantiate FastWalshHadamardProjector, then make whole new
+        # model that gets its params from FastWalshHadamardProjector
+        with tf.name_scope('net_disposable'):
+            # Make disposable direct model
+            model_disposable = define_model(input_images, preproc_images, Conv2D)
+
+            DD = np.sum([np.prod(var.get_shape().as_list()) for var in model_disposable.trainable_weights])
+            del model_disposable
+
+    print '\nProjecting from d = %d to D = %d parameters\n' % (vsize, DD)
+
+    with tf.name_scope('net'):
+        fwh_projector = FastWalshHadamardProjector(vsize, DD)
+
+        Conv2DLayer = lambda *args, **kwargs: RProjConv2D(OffsetCreatorFastfoodProj, fwh_projector, *args, **kwargs)
+
+        model = define_model(input_images, preproc_images, Conv2DLayer)
+        fwh_projector.check_usage()
+
+        for ww in fwh_projector.trainable_weights:
+            model.add_extra_trainable_weight(ww)
+        for ww in fwh_projector.non_trainable_weights:
+            model.add_extra_non_trainable_weight(ww)
+
+    nontrackable_fields = ['input_images', 'preproc_images', 'input_labels']
+    for field in nontrackable_fields:
+        model.add_var(field, locals()[field])
+
+    make_and_add_losses(model, input_labels)
+
+    return model
+
