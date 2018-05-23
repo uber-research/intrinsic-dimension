@@ -1,7 +1,7 @@
 ## Measuring the Intrinsic Dimension of Objective Landscapes
 
 
-This repository contains source code necessary to reproduce the results presented in the ICLR 2018 [paper](https://openreview.net/pdf?id=ryup8-WCW):
+This repository contains source code necessary to reproduce the results presented in the paper [Measuring the Intrinsic Dimension of Objective Landscapes](https://arxiv.org/abs/1804.08838) (ICLR 2018):
 
 ```
 @inproceedings{li_id_2018_ICLR
@@ -12,6 +12,10 @@ This repository contains source code necessary to reproduce the results presente
 }
 ```
 
+For more on this project, see the [Uber AI Labs Blog post](https://eng.uber.com/intrinsic-dimension).
+
+
+
 ## Contents
 There are four steps to use this codebase to reproduce the results in the paper.
 
@@ -20,45 +24,50 @@ There are four steps to use this codebase to reproduce the results in the paper.
 3. [Subspace training](#subspace-training)
     1. Subspace training on image classification tasks
     2. Subspace training on reinforcement learning tasks
-    3. Subspace training of ImageNet classification in distributed GPUs
+    3. Subspace training of ImageNet classification on distributed GPUs
 4. [Collect and plot results](#collect-and-plot-results)
+
 
 
 ## Dependencies
 
-This code is based on Python 2.7, with the main dependencies: [TensorFlow==1.7.0](https://www.tensorflow.org/) and [Keras==2.1.5](https://keras.io/)
- 
- * To run experiments: tensorflow-gpu, keras, numpy, h5py, IPython, colorama, scikit-learn. See "requirements.txt"
- 
+This code is based on Python 2.7, with the main dependencies being [TensorFlow==1.7.0](https://www.tensorflow.org/) and [Keras==2.1.5](https://keras.io/). Additional dependencies for running experiments are: `numpy`, `h5py`, `IPython`, `colorama`, `scikit-learn`. To install all requirements, run
+
+    pip install -r requirements.txt
+
+
+
 ## Prepare datasets
 
-We consider the following datasets: MNIST (_Standard_, _Shuffled-Pixel_ and _Shuffled-Label_ versions), CIFAR-10, and ImageNet.
+We consider the following datasets: MNIST (_Standard_, _Shuffled-Pixel_ and _Shuffled-Label_ versions), CIFAR-10, and ImageNet. For convenience, we provide pre-processed and pre-shuffled versions of all datasets (except ImageNet) in one download file. Data are prepared in `hdf5` format, with `train.h5` and `test.h5` representing separate sets of training and test. Each `.h5` file has the same fields: `images` and `labels`.
 
-All data are prepared in hdf5 format, with `train.h5` and `test.h5` representing separate sets of training and test. Each `.h5` file has the same fields 'images' and 'labels'.
+Datasets can be downloaded [here](https://drive.google.com/open?id=1tTrPWo2KBejmgaqajL19LxFoBoJsVTlI) (zip version is 347 MB, and the full size is 1.5G). To unzip:
 
-Datasets can be downloaded [here](https://drive.google.com/open?id=1Cjky0VL6hFGppPhw3w4S-U4Ns0DAKa5T) (zip version is 347 MB, and the full size is 1.5G).
+    tar xvzf dataset.tar.gz
 
-Put the downloaded and unzipped data in any directory and supply the relative path to `*.h5` to python script when executing (see [Train models](#Train-models) for examples).
+Put the downloaded and unzipped data in any directory and supply the relative path to `*.h5` to python script when executing (see [Train models](#Train-models) for examples). For the below examples, it will be assumed the untarred `dataset` directory is a (possibly symlinked) subdirectory of `intrinsic_dim`, so, e.g., `ls intrinsic_dim/dataset/mnist/train.h5` should work.
+
+
 
 ## Subspace training
 
-We construct custom keras layers for the special projection from subspace to full parameter space. The custom random projection layers (layer objects starting with `RProj`) are in `./keras-ext/` and used in various `model_builder` files in `./intrinsic_dim/`. The main `train.py` script conducts the training loop with the following options taken as arguments:  
+We employ custom Keras layers for the special projection from subspace to full parameter space. The custom random projection layers (layer objects starting with `RProj`) are in [`keras-ext`](https://github.com/uber-research/intrinsic-dimension/tree/master/keras_ext) and used to construct models, e.g. in [`intrinsic_dim/model_builders.py`](https://github.com/uber-research/intrinsic-dimension/blob/master/intrinsic_dim/model_builders.py). The main training script is [`train.py`](https://github.com/uber-research/intrinsic-dimension/blob/master/intrinsic_dim/train.py) and conducts the training loop, taking the following options (among others) as arguments:
 
-- The `first two arguments` specify the paths for training and validation sets (_hdf5_ file), respectively; these arguments are required
-- `--vsize`: subspace dimension, i.e., number of trainable parameters in the low-dimensional space
-- `--epochs`: shortened as `-E`, number of training epochs (type=int); default 5
-- `--opt`: optimization method to be used: e.g. `adam` (tf.train.AdamOptimizer) or `sgd` (tf.train.MomentumOptimizer); default `sgd`
-- `--lr`: learning rate; default=.001
-- `--l2`, L2 regularization to apply to direct parameters (type=float); default=0.0,
-- `--arch`, which architecture to use from `arch_choices` (type=str), default=arch_choices[0]. Example architecture choices for direct training include 'mnistfc_dir', 'cifarfc_dir', 'mnistlenet_dir', 'cifarlenet_dir'; Example architecture choices for subspace training include 'mnistfc', 'cifarfc', 'mnistlenet',  'cifarlenet'                   
+- The `two positional arguments` specify the paths for training and validation sets (two _hdf5_ files), respectively; these arguments are required.
+- `--vsize`: subspace dimension, i.e., number of trainable parameters in the low-dimensional space.
+- `--epochs`: shortened as `-E`, number of training epochs (type=int); default 5.
+- `--opt`: optimization method to be used: e.g. `adam` (`tf.train.AdamOptimizer`) or `sgd` (`tf.train.MomentumOptimizer`); default `sgd`.
+- `--lr`: learning rate; default=.001.
+- `--l2`, L2 regularization to apply to direct parameters (type=float); default=0.0.
+- `--arch`, which architecture to use from `arch_choices` (type=str), default=`mnistfc_dir`. Example architecture choices for direct training include `mnistfc_dir`, `cifarfc_dir`, `mnistlenet_dir`, `cifarlenet_dir`; Example architecture choices for subspace training include `mnistfc`, `cifarfc`, `mnistlenet`,  `cifarlenet`.
 - `--output`: directory to save network checkpoints, tfevent files, etc.
-- `projection type`: one and only one of three methods has to be specified to generate the randhom projection matrix . {`--denseproj`, `--sparseproj`, `--fastfoodproj`}
-- `--depth` and `--width`, Hyperparameters of the fully connected networks: the number and width of layers in FC networks; default: depth=2 and width=200
-- `--minibatch`: shortened as `-mb`, batch size for training; default 128
-- `--d_rate`, Dropout rate to apply to direct parameters (type=float); default=0.0,
-- `--c1`, `--c2`, `--d1` and `--d2`: Hyperparameters of LeNet: number of channels in the first/second conv layer, and width in firse/second in the dense layer; default: c1=6, c2=16, d1=120, d2=84
+- `projection type`: When training a model in a subspace, one and only one of three methods has to be specified to generate the random projection matrix: `--denseproj`, `--sparseproj`, `--fastfoodproj`
+- `--depth` and `--width`, Hyperparameters of the fully connected networks: the number and width of layers in FC networks; default: depth=2 and width=200.
+- `--minibatch`: shortened as `-mb`, batch size for training; default 128.
+- `--d_rate`, Dropout rate to apply to certain direct parameters (type=float); default=0.0.
+- `--c1`, `--c2`, `--d1` and `--d2`: Hyperparameters of LeNet: number of channels in the first/second conv layer, and width in firse/second in the dense layer; default: c1=6, c2=16, d1=120, d2=84.
 
-For more options, please see [`standard_parser.py`](./intrinsic_dim/standard_parser.py) and [`train.py`](./intrinsic_dim/train.py).
+For more options, please see [`standard_parser.py`](./intrinsic_dim/standard_parser.py) and [`train.py`](./intrinsic_dim/train.py), or just run `./train.py -h`.
 
 **1. Subspace training on image classification tasks**
 
@@ -95,7 +104,7 @@ python ./train_dqn.py --vsize 20 --opt adam --lr 0.0001 --l2 0.0001
 ```
 
 
-**3. Subspace training of ImageNet classification in distributed GPUs**
+**3. Subspace training of ImageNet classification on distributed GPUs**
 
 An easy adoption of the software package [horovod](https://github.com/uber/horovod) allows for distributed training on many GPUs, which is helpful for large scale tasks like ImageNet. See [`train_distributed.py`](./intrinsic_dim/train_distributed.py) for details and for an impression how little the incurred changes are from `train.py`.
 
@@ -103,6 +112,8 @@ Follow horovod documentations for MPI and NCLL setup. Once they are, the script 
 ```
 mpirun -np 4 ./train_distrbuted.py path-to-imagenet-data/train.h5 path-to-imagenet-data/test.h5 -E 100
 ```
+
+
 
 ## Collect and plot results
 
@@ -122,7 +133,8 @@ code. Note that without modification, we have copyed our extracted results into 
 _Shortcut: to skip all the work and just see the results, take a look at [this notebook with cached plots](/intrinsic_dim/plots/main_plots.ipynb)._
 
 
+
 ## Questions?
 
-Please drop us ([Chunyuan](http://chunyuan.li/), [Rosanne](rosanne@uber.com) or [Jason](http://yosinski.com/)) a line if you have any questions.
+Please drop us ([Chunyuan](http://chunyuan.li/), [Rosanne](http://users.eecs.northwestern.edu/~rll943/) or [Jason](http://yosinski.com/)) a line if you have any questions.
 
